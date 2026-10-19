@@ -7,9 +7,24 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 
 BASE_DIR = Path(__file__).resolve().parent
-UPLOAD_DIR = BASE_DIR / "private_uploads"
-UPLOAD_DIR.mkdir(exist_ok=True)
-DB_PATH = Path(os.environ.get("PDS_DB", BASE_DIR / "instance" / "pds.sqlite3"))
+
+# Use writable temporary storage on Vercel.
+if os.environ.get("VERCEL") == "1":
+    DATA_DIR = Path("/tmp/problembridge_ai")
+else:
+    DATA_DIR = BASE_DIR / "instance"
+
+DATA_DIR.mkdir(parents=True, exist_ok=True)
+
+UPLOAD_DIR = DATA_DIR / "private_uploads"
+UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+
+DB_PATH = Path(
+    os.environ.get(
+        "PROBLEMBRIDGE_DB",
+        str(DATA_DIR / "problembridge.sqlite3")
+    )
+)
 DB_PATH.parent.mkdir(parents=True, exist_ok=True)
 ALLOWED_EXTENSIONS = {"pdf","txt","py","java","c","cpp","js","html","css","zip","docx","md","png","jpg","jpeg"}
 MAX_CONTENT_LENGTH = 10 * 1024 * 1024
