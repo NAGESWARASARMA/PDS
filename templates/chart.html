@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Activity Overview — PDS{% endblock %}
+{% block content %}
+<section class="page-heading"><span class="eyebrow">YOUR ACTIVITY</span><h1>Progress <span class="gradient-text">overview</span></h1><p>A quick view of your deployments and solution activity.</p></section>
+<div class="stats-grid">
+  <article class="problem-card"><span class="muted">Problems deployed</span><h2>{{ stats.deployed }}</h2></article>
+  <article class="problem-card"><span class="muted">Solutions submitted</span><h2>{{ stats.submitted }}</h2></article>
+  <article class="problem-card"><span class="muted">Accepted solutions</span><h2>{{ stats.accepted }}</h2></article>
+  <article class="problem-card"><span class="muted">Open problems</span><h2>{{ stats.open }}</h2></article>
+  <article class="problem-card"><span class="muted">Solved problems</span><h2>{{ stats.solved }}</h2></article>
+</div>
+<section class="section"><a class="button" href="{{ url_for('my_work') }}">View my work</a></section>
+{% endblock %}
