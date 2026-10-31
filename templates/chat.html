@@ -1,1 +1,36 @@
-{% extends "base.html" %}{% block title %}Chat{% endblock %}{% block content %}<section class="page-heading"><span class="eyebrow">PRIVATE COMMUNICATION</span><h1>Your conversations</h1><p>Chat is available only to the problem deployer and users who submitted a solution.</p></section>{% if conversations %}<div class="problem-grid">{% for c in conversations %}<article class="problem-card"><h3>{{ c.title }}</h3><p class="muted">Problem #{{ c.id }}</p><a class="button" href="{{ url_for('message',problem_id=c.id) }}">Open conversation</a></article>{% endfor %}</div>{% else %}<div class="empty-state"><h3>No eligible conversations yet</h3><p>Submit a solution or open one of your problem posts to start a conversation with an eligible participant.</p><a class="button" href="{{ url_for('dashboard') }}">Explore problems</a></div>{% endif %}{% endblock %}
+{% extends "base.html" %}
+
+{% block title %}Messages & Collaboration — PDS{% endblock %}
+
+{% block content %}
+<section style="margin-bottom: 28px;">
+  <span class="eyebrow">Encrypted Direct Channels</span>
+  <h1>Your active <span class="gradient-text">conversations</span></h1>
+  <p>Communicate directly regarding problem requirements and solution iterations. Only deployers and verified solvers have access to specific challenge channels.</p>
+</section>
+
+{% if conversations %}
+  <div class="problem-grid">
+    {% for c in conversations %}
+      <article class="problem-card">
+        <div class="card-top">
+          <span class="tag">{{ c.category }}</span>
+          <span class="status {% if c.status == 'Solved' %}solved{% elif c.status == 'Open' %}paid{% endif %}">{{ c.status }}</span>
+        </div>
+        <h3>{{ c.title }}</h3>
+        <div class="card-meta">
+          <span>Challenge #{{ c.id }}</span>
+          <span>{{ c.msg_count }} messages exchanged</span>
+        </div>
+        <a class="button" href="{{ url_for('message', problem_id=c.id) }}" style="margin-top: 14px;">Open Discussion Channel &rarr;</a>
+      </article>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="empty-state">
+    <h3>No active communication channels</h3>
+    <p>Submit a solution proposal or deploy a challenge to establish a direct communication channel with participants.</p>
+    <a class="button" href="{{ url_for('dashboard') }}">Explore Challenges</a>
+  </div>
+{% endif %}
+{% endblock %}

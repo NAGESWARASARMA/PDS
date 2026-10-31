@@ -1,4 +1,67 @@
-{% extends "base.html" %}{% block title %}Chat — {{ p.title }}{% endblock %}{% block content %}<section class="page-heading"><span class="eyebrow">PROBLEM CHAT</span><h1>{{ p.title }}</h1><p>Keep communication relevant to this problem. Do not share passwords or financial credentials.</p></section>
-{% if participants %}<form method="get" class="filter-panel"><label for="peer">Conversation with</label><select id="peer" name="peer">{% for u in participants %}<option value="{{ u.id }}" {% if peer==u.id %}selected{% endif %}>{{ u.username }}</option>{% endfor %}</select><button class="button" type="submit">Open</button></form>{% endif %}
-<div class="chat-panel">{% if messages %}{% for m in messages %}<article class="message {% if m.sender_id==current_user.id %}mine{% endif %}"><strong>{{ m.sender_name }}</strong><p class="preserve">{{ m.body }}</p><time>{{ m.created_at }}</time></article>{% endfor %}{% else %}<p class="muted">No messages yet. Start the conversation below.</p>{% endif %}</div>
-{% if recipient_id %}<form method="post" class="panel form-stack"><input type="hidden" name="_csrf" value="{{ csrf_token() }}"><input type="hidden" name="recipient_id" value="{{ recipient_id }}"><label for="body">Message</label><textarea id="body" name="body" rows="3" maxlength="3000" required></textarea><button class="button" type="submit">Send message</button></form>{% else %}<p class="notice info">A solver must submit a solution before the deployer can message them.</p>{% endif %}{% endblock %}
+{% extends "base.html" %}
+
+{% block title %}Chat — {{ p.title }} — PDS{% endblock %}
+
+{% block content %}
+<section style="margin-bottom: 24px;">
+  <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px;">
+    <span class="eyebrow">CHALLENGE CHAT</span>
+    <span class="status {% if p.status == 'Solved' %}solved{% elif p.status == 'Open' %}paid{% endif %}">{{ p.status }}</span>
+  </div>
+  <h1>{{ p.title }}</h1>
+  <p>Dedicated communication thread. Never share passwords, private keys, or financial credentials.</p>
+</section>
+
+{% if participants %}
+  <form method="get" class="filter-panel" style="margin-bottom: 20px;">
+    <label for="peer" style="margin: 0; font-weight: 700;">Direct Channel with:</label>
+    <select id="peer" name="peer" style="max-width: 250px;">
+      {% for u in participants %}
+        <option value="{{ u.id }}" {% if peer == u.id %}selected{% endif %}>{{ u.username }} (Solver)</option>
+      {% endfor %}
+    </select>
+    <button class="button small-button" type="submit">Switch Channel</button>
+  </form>
+{% endif %}
+
+<div class="chat-panel" role="log" aria-live="polite">
+  {% if messages %}
+    {% for m in messages %}
+      <article class="message {% if m.sender_id == current_user.id %}mine{% endif %}">
+        <div style="display: flex; justify-content: space-between; gap: 12px; margin-bottom: 4px;">
+          <strong style="font-size: 0.88rem;">{{ m.sender_name }}</strong>
+          {% if m.sender_id == current_user.id %}
+            <span style="font-size: 0.72rem; color: var(--primary);">You</span>
+          {% endif %}
+        </div>
+        <p class="preserve" style="margin: 0; font-size: 0.94rem;">{{ m.body }}</p>
+        <time datetime="{{ m.created_at }}">{{ m.created_at[:16].replace('T', ' ') }} UTC</time>
+      </article>
+    {% endfor %}
+  {% else %}
+    <div style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
+      <p>No messages exchanged yet. Start the conversation regarding this challenge below.</p>
+    </div>
+  {% endif %}
+</div>
+
+{% if recipient_id %}
+  <form method="post" class="panel form-stack">
+    <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+    <input type="hidden" name="recipient_id" value="{{ recipient_id }}">
+
+    <div>
+      <label for="body">Send Message</label>
+      <textarea id="body" name="body" rows="3" maxlength="3000" placeholder="Type your message here..." required></textarea>
+    </div>
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <small style="color: var(--text-subtle);">Direct message delivered to participant.</small>
+      <button class="button" type="submit">Send Message &rarr;</button>
+    </div>
+  </form>
+{% else %}
+  <div class="notice info">
+    A candidate solver must submit a solution proposal before a direct conversation channel can be established.
+  </div>
+{% endif %}
+{% endblock %}

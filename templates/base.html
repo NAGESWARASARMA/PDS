@@ -1,16 +1,61 @@
 <!doctype html>
-<html lang="en"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#070b14"><meta name="description" content="PDS connects problem deployers and solvers.">
-<title>{% block title %}PDS{% endblock %}</title>
-<link rel="stylesheet" href="{{ url_for('static',filename='style.css') }}">
-</head><body>
-<header class="navbar"><a class="brand" href="{{ url_for('index') }}"><span class="brand-mark">PB</span> PDS <b>AI</b></a>
-<nav><a href="{{ url_for('index') }}">Home</a><a href="{{ url_for('dashboard') }}">Find Problems</a>
-{% if current_user %}<a href="{{ url_for('post') }}">Deploy</a><a href="{{ url_for('solved') }}">Solved</a><a href="{{ url_for('chat') }}">Chat</a><a href="{{ url_for('my_work') }}">My Work</a><a href="{{ url_for('chart') }}">Activity</a><a href="{{ url_for('profile') }}">Profile</a><form class="inline" method="post" action="{{ url_for('logout') }}"><input type="hidden" name="_csrf" value="{{ csrf_token() }}"><button class="nav-button" type="submit">Logout</button></form>
-{% else %}<a class="nav-button" href="{{ url_for('auth') }}">Login / Register</a>{% endif %}</nav></header>
-<main class="container">
-{% with notices=get_flashed_messages(with_categories=true) %}{% for category,notice in notices %}<div class="notice {{ category }}" role="status">{{ notice }}</div>{% endfor %}{% endwith %}
-{% block content %}{% endblock %}
-</main><footer class="footer"><span>PDS</span><span>Communication and collaboration platform. Payments happen outside this website.</span></footer>
-</body></html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#09090b">
+  <meta name="description" content="PDS — Premier platform connecting problem deployers and skilled solvers.">
+  <title>{% block title %}PDS — Problem Deployment & Solving{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script defer src="{{ url_for('static', filename='app.js') }}"></script>
+</head>
+<body>
+  <header class="navbar">
+    <a class="brand" href="{{ url_for('index') }}">
+      <span class="brand-mark">PDS</span>
+      <span>ProblemBridge <b>AI</b></span>
+    </a>
+    <nav>
+      <a href="{{ url_for('index') }}">Home</a>
+      <a href="{{ url_for('dashboard') }}">Explore Problems</a>
+      {% if current_user %}
+        <a href="{{ url_for('post') }}">Deploy Challenge</a>
+        <a href="{{ url_for('solved') }}">Solved Work</a>
+        <a href="{{ url_for('chat') }}">Messages</a>
+        <a href="{{ url_for('my_work') }}">My Work</a>
+        <a href="{{ url_for('chart') }}">Activity</a>
+        <a href="{{ url_for('profile') }}">Profile</a>
+        <form class="inline" method="post" action="{{ url_for('logout') }}">
+          <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+          <button class="nav-button" type="submit">Sign Out</button>
+        </form>
+      {% else %}
+        <a class="nav-button" href="{{ url_for('auth') }}">Sign In / Register</a>
+      {% endif %}
+    </nav>
+  </header>
+
+  <main class="container">
+    {% with notices = get_flashed_messages(with_categories=true) %}
+      {% if notices %}
+        {% for category, notice in notices %}
+          <div class="notice {{ category }}" role="alert">
+            <span>{{ notice }}</span>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="footer">
+    <div>
+      <b>PDS AI</b> — Secure, decentralized challenge resolution platform.
+    </div>
+    <div>
+      <span>Payments and external arrangements occur independently. &copy; {{ now_year }} PDS Inc.</span>
+    </div>
+  </footer>
+</body>
+</html>

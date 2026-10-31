@@ -1,0 +1,30 @@
+# Python bytecode & cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Environments
+.env
+.venv/
+venv/
+env/
+ENV/
+
+# Local databases & uploads (keep data private)
+instance/
+private_uploads/
+*.sqlite3
+*.sqlite3-wal
+*.sqlite3-shm
+
+# IDE / Editor artifacts
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Testing artifacts
+.pytest_cache/
+.coverage
+htmlcov/

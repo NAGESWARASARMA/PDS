@@ -1,4 +1,57 @@
-{% extends "base.html" %}{% block title %}Login and Register{% endblock %}{% block content %}
-<section class="page-heading"><span class="eyebrow">YOUR ACCOUNT</span><h1>Welcome to <span class="gradient-text">PDS</span></h1><p>Sign in to deploy challenges, submit solutions, and chat with participants.</p></section>
-<div class="auth-grid"><form method="post" class="panel form-stack"><h2>Login</h2><input type="hidden" name="_csrf" value="{{ csrf_token() }}"><input type="hidden" name="action" value="login"><label>Username</label><input name="username" minlength="3" maxlength="40" required autocomplete="username"><label>Password</label><input name="password" type="password" required autocomplete="current-password"><button class="button" type="submit">Login</button></form>
-<form method="post" class="panel form-stack"><h2>Create account</h2><input type="hidden" name="_csrf" value="{{ csrf_token() }}"><input type="hidden" name="action" value="register"><label>Username</label><input name="username" minlength="3" maxlength="40" pattern="[A-Za-z0-9_.-]+" required autocomplete="username"><label>Password (10+ characters)</label><input name="password" type="password" minlength="10" required autocomplete="new-password"><button class="button secondary" type="submit">Register</button><p class="muted small">Use a unique password. Never reuse a password from another account.</p></form></div>{% endblock %}
+{% extends "base.html" %}
+
+{% block title %}Sign In / Register — PDS{% endblock %}
+
+{% block content %}
+<section style="margin-bottom: 28px; text-align: center;">
+  <span class="eyebrow">Identity & Access</span>
+  <h1>Welcome to <span class="gradient-text">PDS AI</span></h1>
+  <p>Sign in to deploy problems, submit technical solutions, and communicate directly with challenge owners.</p>
+</section>
+
+<div class="form-grid" style="max-width: 900px; margin: 0 auto; gap: 32px;">
+  <!-- Login Form -->
+  <form method="post" action="{{ url_for('auth') }}" class="panel form-stack">
+    <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+    <input type="hidden" name="action" value="login">
+
+    <h2>Sign In</h2>
+    <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 12px;">Access your active deployments and proposals.</p>
+
+    <div>
+      <label for="login_user">Username</label>
+      <input id="login_user" name="username" minlength="3" maxlength="40" required autocomplete="username" placeholder="Your username">
+    </div>
+
+    <div>
+      <label for="login_pass">Password</label>
+      <input id="login_pass" name="password" type="password" required autocomplete="current-password" placeholder="••••••••••••">
+    </div>
+
+    <button class="button" type="submit" style="margin-top: 10px;">Sign In to PDS &rarr;</button>
+  </form>
+
+  <!-- Register Form -->
+  <form method="post" action="{{ url_for('auth') }}" class="panel form-stack">
+    <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+    <input type="hidden" name="action" value="register">
+
+    <h2>Create Account</h2>
+    <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 12px;">Join the technical problem-solving network.</p>
+
+    <div>
+      <label for="reg_user">Desired Username</label>
+      <input id="reg_user" name="username" minlength="3" maxlength="40" pattern="[A-Za-z0-9_.-]+" required autocomplete="username" placeholder="e.g. dev_architect">
+      <small style="color: var(--text-subtle);">3–40 characters: letters, numbers, dot, dash, underscore.</small>
+    </div>
+
+    <div>
+      <label for="reg_pass">Strong Password</label>
+      <input id="reg_pass" name="password" type="password" minlength="10" required autocomplete="new-password" placeholder="Min. 10 characters">
+      <small style="color: var(--text-subtle);">At least 10 chars with uppercase, lowercase, and numeric digits.</small>
+    </div>
+
+    <button class="button secondary" type="submit" style="margin-top: 10px;">Create Free Account &rarr;</button>
+  </form>
+</div>
+{% endblock %}

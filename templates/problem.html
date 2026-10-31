@@ -1,7 +1,150 @@
-{% extends "base.html" %}{% block title %}{{ p.title }}{% endblock %}{% block content %}
-<section class="page-heading"><span class="eyebrow">PROBLEM #{{ p.public_id }}</span><h1>{{ p.title }}</h1><div class="card-top"><span class="tag">{{ p.category }}</span><span class="status">{{ p.problem_type }}</span><span class="status">{{ p.status }}</span></div></section>
-<div class="detail-layout"><section class="panel"><h2>Problem statement</h2><p class="preserve">{{ p.statement }}</p><h2>Description</h2><p class="preserve">{{ p.description }}</p>{% if p.requirements %}<h2>Requirements</h2><p class="preserve">{{ p.requirements }}</p>{% endif %}{% if p.expected_result %}<h2>Expected result</h2><p class="preserve">{{ p.expected_result }}</p>{% endif %}{% if p.skills %}<h2>Skills</h2><p>{{ p.skills }}</p>{% endif %}{% if p.instructions %}<h2>Additional instructions</h2><p class="preserve">{{ p.instructions }}</p>{% endif %}{% if p.deliverables %}<h2>Deliverables</h2><p>{{ p.deliverables }}</p>{% endif %}{% if p.acceptance_criteria %}<h2>Acceptance criteria</h2><p class="preserve">{{ p.acceptance_criteria }}</p>{% endif %}{% if p.attachment_key %}<a class="text-link" href="{{ url_for('problem_attachment',problem_id=p.id) }}">Download reference attachment</a>{% endif %}</section>
-<aside class="panel"><h2>Overview</h2><p><span class="muted">Deployer</span><br><strong>{{ p.deployer_name }}</strong></p><p><span class="muted">Posted</span><br>{{ p.created_at }}</p><p><span class="muted">Views</span><br>{{ p.views }}</p>{% if p.problem_type=='Paid' %}<p class="reward-line">Reward offered: ₹{{ '%.2f'|format(p.reward) }}</p><p><span class="muted">Deadline</span><br>{{ p.deadline }}</p><p class="small muted">Reward is not held or paid by this website.</p>{% endif %}
-{% if current_user and not own and p.status=='Open' and not already %}<a class="button block" href="{{ url_for('solve',problem_id=p.id) }}">Submit solution</a>{% elif already %}<p class="notice info">You have already submitted a solution.</p>{% endif %}
-{% if current_user and own %}<h2>Submissions</h2>{% if solutions %}{% for s in solutions %}<div class="submission"><strong>{{ s.username }}</strong><span class="status">{{ s.status }}</span><p class="preserve">{{ s.explanation }}</p><p class="muted small">Submitted {{ s.created_at }}</p>{% if s.file_key %}<a class="text-link" href="{{ url_for('solution_file',solution_id=s.id) }}">Download attachment</a>{% endif %}{% if p.status=='Open' %}<form method="post" action="{{ url_for('solution_status',solution_id=s.id) }}" class="action-row"><input type="hidden" name="_csrf" value="{{ csrf_token() }}"><button class="button small-button" name="status" value="Accepted">Accept</button><button class="button secondary small-button" name="status" value="Rejected">Reject</button><button class="button secondary small-button" name="status" value="Changes requested">Request changes</button></form>{% endif %}</div>{% endfor %}{% else %}<p class="muted">No submissions yet.</p>{% endif %}{% endif %}
-{% if current_user and (own or already) %}<a class="button secondary block" href="{{ url_for('message',problem_id=p.id) }}">Open problem chat</a>{% endif %}</aside></div>{% endblock %}
+{% extends "base.html" %}
+
+{% block title %}{{ p.title }} — PDS{% endblock %}
+
+{% block content %}
+<section style="margin-bottom: 28px;">
+  <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px;">
+    <span class="eyebrow">CHALLENGE #{{ p.public_id }}</span>
+    <span class="tag">{{ p.category }}</span>
+    <span class="status {% if p.problem_type == 'Paid' %}paid{% endif %}">{{ p.problem_type }}</span>
+    <span class="status {% if p.status == 'Solved' %}solved{% elif p.status == 'Open' %}paid{% else %}rejected{% endif %}">{{ p.status }}</span>
+  </div>
+  <h1>{{ p.title }}</h1>
+</section>
+
+<div class="detail-layout">
+  <section class="panel">
+    <h3>Problem Statement</h3>
+    <p class="preserve">{{ p.statement }}</p>
+
+    <h3 style="margin-top: 24px;">Comprehensive Description</h3>
+    <p class="preserve">{{ p.description }}</p>
+
+    {% if p.requirements %}
+      <h3 style="margin-top: 24px;">Technical Requirements</h3>
+      <p class="preserve">{{ p.requirements }}</p>
+    {% endif %}
+
+    {% if p.expected_result %}
+      <h3 style="margin-top: 24px;">Expected Outcome & Deliverables</h3>
+      <p class="preserve">{{ p.expected_result }}</p>
+    {% endif %}
+
+    {% if p.skills %}
+      <h3 style="margin-top: 24px;">Required Skills & Technologies</h3>
+      <p>{{ p.skills }}</p>
+    {% endif %}
+
+    {% if p.instructions %}
+      <h3 style="margin-top: 24px;">Submission Guidelines</h3>
+      <p class="preserve">{{ p.instructions }}</p>
+    {% endif %}
+
+    {% if p.acceptance_criteria %}
+      <h3 style="margin-top: 24px;">Acceptance Criteria</h3>
+      <p class="preserve">{{ p.acceptance_criteria }}</p>
+    {% endif %}
+
+    {% if p.attachment_key %}
+      <div style="margin-top: 28px; padding: 16px; background: var(--surface-elevated); border: 1px solid var(--border); border-radius: var(--radius-sm);">
+        <label>Reference Attachment</label>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span>{{ p.attachment_name }}</span>
+          <a class="button small-button" href="{{ url_for('problem_attachment', problem_id=p.id) }}">Download File</a>
+        </div>
+      </div>
+    {% endif %}
+
+    {% if accepted_solution %}
+      <div style="margin-top: 32px; padding: 20px; border: 1px solid var(--success); background: var(--success-bg); border-radius: var(--radius-md);">
+        <div class="tag" style="background: var(--success); color: #fff; margin-bottom: 8px;">ACCEPTED SOLUTION</div>
+        <h4>Solved by {{ accepted_solution.solver_name }}</h4>
+        <p class="preserve">{{ accepted_solution.explanation }}</p>
+        {% if accepted_solution.file_key %}
+          <a class="button small-button" href="{{ url_for('solution_file', solution_id=accepted_solution.id) }}">Download Verified Solution File</a>
+        {% endif %}
+      </div>
+    {% endif %}
+  </section>
+
+  <aside class="panel">
+    <h3>Challenge Meta</h3>
+    <p><span class="muted" style="font-size: 0.8rem; color: var(--text-muted);">Published by</span><br><strong>{{ p.deployer_name }}</strong></p>
+    <p><span class="muted" style="font-size: 0.8rem; color: var(--text-muted);">Date Deployed</span><br>{{ p.created_at[:10] }}</p>
+    <p><span class="muted" style="font-size: 0.8rem; color: var(--text-muted);">Engagement</span><br>{{ p.views }} views</p>
+
+    {% if p.problem_type == 'Paid' %}
+      <div style="margin: 16px 0; padding: 14px; background: var(--surface-elevated); border-radius: var(--radius-sm); border: 1px solid var(--border);">
+        <span style="font-size: 0.78rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Offered Reward</span>
+        <div class="reward-line">${{ '%.2f'|format(p.reward) }}</div>
+        <p style="font-size: 0.82rem; margin: 4px 0 0; color: var(--text-muted);">
+          Deadline: <b>{{ p.deadline or 'Not specified' }}</b>
+        </p>
+        <p style="font-size: 0.74rem; color: var(--text-subtle); margin-top: 8px;">
+          Note: PDS facilitates verification. Payments are conducted off-platform.
+        </p>
+      </div>
+    {% endif %}
+
+    <!-- Action Buttons for Solvers -->
+    {% if current_user and not own and p.status == 'Open' %}
+      {% if not already %}
+        <a class="button block" href="{{ url_for('solve', problem_id=p.id) }}" style="margin: 16px 0;">Submit Solution Proposal</a>
+      {% elif my_solution.status == 'Changes requested' %}
+        <div class="notice" style="background: var(--warning-bg); border-color: var(--warning); margin: 12px 0;">
+          Changes requested: {{ my_solution.review_feedback }}
+        </div>
+        <a class="button block" href="{{ url_for('solve', problem_id=p.id) }}">Revise Solution Submission</a>
+      {% else %}
+        <div class="notice info" style="margin: 16px 0;">
+          Your solution is submitted (Status: <b>{{ my_solution.status }}</b>)
+        </div>
+      {% endif %}
+    {% endif %}
+
+    {% if current_user and (own or already) %}
+      <a class="button secondary block" href="{{ url_for('message', problem_id=p.id) }}">Open Problem Chat &rarr;</a>
+    {% endif %}
+
+    <!-- Deployer Review Management -->
+    {% if current_user and own %}
+      <h3 style="margin-top: 28px; border-top: 1px solid var(--border); padding-top: 18px;">Submitted Proposals ({{ solutions|length }})</h3>
+      {% if solutions %}
+        {% for s in solutions %}
+          <div class="submission">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <strong>{{ s.username }}</strong>
+              <span class="status {% if s.status == 'Accepted' %}solved{% elif s.status == 'Rejected' %}rejected{% elif s.status == 'Changes requested' %}changes{% endif %}">
+                {{ s.status }}
+              </span>
+            </div>
+            <p class="preserve" style="font-size: 0.9rem;">{{ s.explanation }}</p>
+            {% if s.review_feedback %}
+              <div style="font-size: 0.82rem; color: var(--text-muted); font-style: italic; margin-bottom: 8px;">
+                Feedback given: "{{ s.review_feedback }}"
+              </div>
+            {% endif %}
+
+            {% if s.file_key %}
+              <a class="text-link" href="{{ url_for('solution_file', solution_id=s.id) }}" style="margin-bottom: 12px;">Download Attachment &darr;</a>
+            {% endif %}
+
+            {% if p.status == 'Open' %}
+              <form method="post" action="{{ url_for('solution_status', solution_id=s.id) }}" class="action-row">
+                <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+                <input type="text" name="review_feedback" placeholder="Optional review feedback note..." style="font-size: 0.82rem; padding: 6px 10px; margin-bottom: 6px;">
+                <button class="button small-button" name="status" value="Accepted">Accept Solution</button>
+                <button class="button secondary small-button" name="status" value="Changes requested">Request Changes</button>
+                <button class="button secondary small-button" name="status" value="Rejected">Reject</button>
+              </form>
+            {% endif %}
+          </div>
+        {% endfor %}
+      {% else %}
+        <p style="font-size: 0.88rem; color: var(--text-muted);">No candidate submissions received yet.</p>
+      {% endif %}
+    {% endif %}
+  </aside>
+</div>
+{% endblock %}

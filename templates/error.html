@@ -1,1 +1,18 @@
-{% extends "base.html" %}{% block title %}Error {{ code }}{% endblock %}{% block content %}<div class="empty-state"><span class="eyebrow">REQUEST ERROR</span><h1>{{ code }}</h1><p>{{ message }}</p><a class="button" href="{{ url_for('index') }}">Return home</a></div>{% endblock %}
+{% extends "base.html" %}
+
+{% block title %}Error {{ code }} — PDS{% endblock %}
+
+{% block content %}
+<div class="empty-state" style="padding: 80px 24px; max-width: 580px; margin: 40px auto;">
+  <span class="eyebrow" style="color: var(--danger); border-color: rgba(239, 68, 68, 0.3); background: var(--danger-bg);">
+    HTTP Error {{ code }}
+  </span>
+  <h1 style="font-size: 3.5rem; margin: 16px 0; color: #fff;">{{ code }}</h1>
+  <p style="font-size: 1.1rem; color: var(--text-muted); margin-bottom: 28px;">{{ message }}</p>
+
+  <div class="actions">
+    <a class="button" href="{{ url_for('index') }}">&larr; Return to Safety (Home)</a>
+    <a class="button secondary" href="javascript:history.back()">Go Back</a>
+  </div>
+</div>
+{% endblock %}

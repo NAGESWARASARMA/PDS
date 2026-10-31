@@ -1,1 +1,40 @@
-{% extends "base.html" %}{% block title %}Profile{% endblock %}{% block content %}<section class="page-heading"><span class="eyebrow">YOUR ACCOUNT</span><h1>{{ user.username }}'s profile</h1></section><div class="stats-grid"><div class="stat"><span>Problems deployed</span><strong>{{ stats.deployed }}</strong></div><div class="stat"><span>Solutions submitted</span><strong>{{ stats.solutions }}</strong></div><div class="stat"><span>Accepted solutions</span><strong>{{ stats.accepted }}</strong></div></div><form method="post" class="panel form-stack"><input type="hidden" name="_csrf" value="{{ csrf_token() }}"><label for="bio">About you</label><textarea id="bio" name="bio" rows="4" maxlength="500">{{ user.bio }}</textarea><button class="button" type="submit">Save profile</button></form>{% endblock %}
+{% extends "base.html" %}
+
+{% block title %}User Profile — {{ user.username }} — PDS{% endblock %}
+
+{% block content %}
+<section style="margin-bottom: 28px;">
+  <span class="eyebrow">Account Overview</span>
+  <h1>{{ user.username }}'s <span class="gradient-text">Profile</span></h1>
+  <p>Member since {{ user.created_at[:10] }}</p>
+</section>
+
+<div class="stats-grid">
+  <div class="stat">
+    <span>Problems Deployed</span>
+    <strong>{{ stats.deployed }}</strong>
+  </div>
+  <div class="stat">
+    <span>Solutions Submitted</span>
+    <strong>{{ stats.solutions }}</strong>
+  </div>
+  <div class="stat">
+    <span>Verified Solutions</span>
+    <strong>{{ stats.accepted }}</strong>
+  </div>
+</div>
+
+<form method="post" action="{{ url_for('profile') }}" class="panel form-stack" style="max-width: 700px;">
+  <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+  
+  <h3>Profile Biography</h3>
+  <p style="font-size: 0.88rem; color: var(--text-muted);">Share your engineering background, research interests, and preferred technical domains.</p>
+
+  <div>
+    <label for="bio">About You (Max 500 characters)</label>
+    <textarea id="bio" name="bio" rows="4" maxlength="500" placeholder="e.g. Distributed systems engineer focused on high-concurrency architectures and fault-tolerant databases...">{{ user.bio }}</textarea>
+  </div>
+
+  <button class="button" type="submit" style="align-self: flex-start;">Save Profile Changes &rarr;</button>
+</form>
+{% endblock %}

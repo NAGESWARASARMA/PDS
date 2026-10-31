@@ -1,1 +1,42 @@
-{% extends "base.html" %}{% block title %}Submit Solution{% endblock %}{% block content %}<section class="page-heading"><span class="eyebrow">SOLUTION SUBMISSION</span><h1>Submit your approach</h1><p>{{ p.title }}</p></section><form method="post" enctype="multipart/form-data" class="panel form-stack"><input type="hidden" name="_csrf" value="{{ csrf_token() }}"><label>Solution explanation (at least 20 characters)</label><textarea name="explanation" rows="7" maxlength="10000" required></textarea><label>Implementation details</label><textarea name="implementation" rows="4" maxlength="5000"></textarea><label>Advantages</label><textarea name="advantages" rows="3" maxlength="3000"></textarea><label>Optional source code or supporting file (max 10 MB)</label><input type="file" name="solution_file" accept=".pdf,.txt,.py,.java,.c,.cpp,.js,.html,.css,.zip,.docx,.md,.png,.jpg,.jpeg"><p class="muted small">Submitting a solution does not create a payment transaction. Discuss any external arrangement directly and carefully.</p><button class="button" type="submit">Submit for review</button></form>{% endblock %}
+{% extends "base.html" %}
+
+{% block title %}Submit Solution Proposal — PDS{% endblock %}
+
+{% block content %}
+<section style="margin-bottom: 24px;">
+  <span class="eyebrow">Solution Engineering</span>
+  <h1>Submit your proposal</h1>
+  <p>Target Challenge: <b>{{ p.title }}</b> (Published by {{ p.deployer_name }})</p>
+</section>
+
+<form method="post" enctype="multipart/form-data" class="panel form-stack" style="max-width: 860px;">
+  <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+
+  <div>
+    <label for="explanation">Comprehensive Solution Explanation *</label>
+    <textarea id="explanation" name="explanation" rows="6" maxlength="10000" placeholder="Describe your methodology, system architecture, algorithmic approaches, or proofs (minimum 20 characters)..." required></textarea>
+  </div>
+
+  <div>
+    <label for="implementation">Implementation Details & Code Walkthrough</label>
+    <textarea id="implementation" name="implementation" rows="4" maxlength="5000" placeholder="Specify code snippets, configuration files, schema adjustments, or steps to run..."></textarea>
+  </div>
+
+  <div>
+    <label for="advantages">Competitive Advantages & Benchmarks</label>
+    <textarea id="advantages" name="advantages" rows="3" maxlength="3000" placeholder="Why is this approach superior? (e.g., lower time complexity, test coverage, memory safety)..."></textarea>
+  </div>
+
+  <div>
+    <label for="solution_file">Supporting Code Archive / Documentation (Max 10 MB)</label>
+    <input id="solution_file" type="file" name="solution_file" accept=".pdf,.txt,.py,.java,.c,.cpp,.js,.html,.css,.zip,.docx,.md,.png,.jpg,.jpeg">
+    <small style="color: var(--text-subtle);">Supported formats: Zip archives, source code files, PDF reports, technical briefs.</small>
+  </div>
+
+  <div class="notice info" style="margin-top: 14px;">
+    <strong>Submission Policy:</strong> Deployers review candidate solutions privately. Submitting does not create financial claims on PDS.
+  </div>
+
+  <button class="button" type="submit" style="align-self: flex-start;">Submit Solution for Deployer Review &rarr;</button>
+</form>
+{% endblock %}

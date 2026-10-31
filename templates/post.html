@@ -1,3 +1,106 @@
-{% extends "base.html" %}{% block title %}Deploy a Problem{% endblock %}{% block content %}
-<section class="page-heading"><span class="eyebrow">PROBLEM DEPLOYMENT</span><h1>Publish a challenge</h1><p>Explain the problem clearly so potential solvers understand what is needed.</p></section>
-<form method="post" enctype="multipart/form-data" class="panel form-stack"><input type="hidden" name="_csrf" value="{{ csrf_token() }}"><div class="form-grid"><div><label>Problem type</label><select name="problem_type" required><option value="Free">Free problem</option><option value="Paid">Paid problem (external reward)</option></select></div><div><label>Category</label><select name="category" required>{% for c in categories %}<option>{{ c }}</option>{% endfor %}</select></div><div class="full"><label>Problem title</label><input name="title" maxlength="160" required></div><div class="full"><label>Problem statement</label><textarea name="statement" rows="4" maxlength="10000" required></textarea></div><div class="full"><label>Description</label><textarea name="description" rows="5" maxlength="10000" required></textarea></div><div class="full"><label>Requirements</label><textarea name="requirements" rows="3" maxlength="5000"></textarea></div><div><label>Expected result / advantages</label><textarea name="expected_result" rows="3" maxlength="3000"></textarea></div><div><label>Skills required</label><input name="skills" maxlength="500"></div><div class="full"><label>Additional instructions</label><textarea name="instructions" rows="3" maxlength="3000"></textarea></div><div><label>Reward amount in ₹ (paid only)</label><input name="reward" type="number" min="0.01" step="0.01"></div><div><label>Deadline (paid only)</label><input name="deadline" type="datetime-local"></div><div><label>Duration estimate</label><input name="duration" maxlength="100" placeholder="e.g. 1 week"></div><div><label>Expected deliverables</label><input name="deliverables" maxlength="1000"></div><div class="full"><label>Acceptance criteria</label><textarea name="acceptance_criteria" rows="3" maxlength="3000"></textarea></div><div class="full"><label>Optional reference file (max 10 MB)</label><input type="file" name="attachment" accept=".pdf,.txt,.py,.java,.c,.cpp,.js,.html,.css,.zip,.docx,.md,.png,.jpg,.jpeg"></div></div><p class="notice info">PDS does not collect, process, escrow, or transfer rewards. Any payment agreement is handled independently by the participants.</p><button class="button" type="submit">Publish problem</button></form>{% endblock %}
+{% extends "base.html" %}
+
+{% block title %}Deploy a Challenge — PDS{% endblock %}
+
+{% block content %}
+<section style="margin-bottom: 24px;">
+  <span class="eyebrow">Problem Deployment</span>
+  <h1>Publish a new <span class="gradient-text">challenge</span></h1>
+  <p>Detail your problem with precision. The more comprehensive your specifications, the higher quality solutions you will receive.</p>
+</section>
+
+<form method="post" enctype="multipart/form-data" class="panel form-stack">
+  <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+
+  <div class="form-grid">
+    <div>
+      <label for="problem_type">Engagement Model *</label>
+      <select id="problem_type" name="problem_type" required>
+        <option value="Free">Free Community Challenge</option>
+        <option value="Paid">Paid Challenge (External Reward)</option>
+      </select>
+    </div>
+
+    <div>
+      <label for="category">Category *</label>
+      <select id="category" name="category" required>
+        {% for c in categories %}
+          <option value="{{ c }}">{{ c }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="full">
+      <label for="title">Challenge Title *</label>
+      <input id="title" name="title" maxlength="160" placeholder="e.g., High-throughput event streaming architecture using WebSockets" required>
+    </div>
+
+    <div class="full">
+      <label for="statement">Problem Statement (Executive Summary) *</label>
+      <textarea id="statement" name="statement" rows="3" maxlength="3000" placeholder="Summarize the core problem in 2-3 sentences..." required></textarea>
+    </div>
+
+    <div class="full">
+      <label for="description">Detailed Description & Technical Background *</label>
+      <textarea id="description" name="description" rows="6" maxlength="10000" placeholder="Provide full context, constraints, data schemas, or current roadblocks..." required></textarea>
+    </div>
+
+    <div class="full">
+      <label for="requirements">Technical Requirements & Constraints</label>
+      <textarea id="requirements" name="requirements" rows="3" maxlength="5000" placeholder="e.g., Must compile in Python 3.11+, memory usage under 256MB, sub-second latency..."></textarea>
+    </div>
+
+    <div>
+      <label for="expected_result">Expected Outcomes & Deliverables</label>
+      <textarea id="expected_result" name="expected_result" rows="3" maxlength="3000" placeholder="e.g., Pull request, benchmark report, Docker container..."></textarea>
+    </div>
+
+    <div>
+      <label for="skills">Desired Tech Stack & Skills</label>
+      <input id="skills" name="skills" maxlength="500" placeholder="e.g., Python, PostgreSQL, Redis, Kubernetes">
+    </div>
+
+    <div class="full">
+      <label for="instructions">Submission Guidelines</label>
+      <textarea id="instructions" name="instructions" rows="2" maxlength="3000" placeholder="Specific instructions for candidate solvers..."></textarea>
+    </div>
+
+    <div>
+      <label for="reward">Offered Reward in USD ($) (Paid Only)</label>
+      <input id="reward" name="reward" type="number" min="0.01" step="0.01" placeholder="e.g., 250.00">
+    </div>
+
+    <div>
+      <label for="deadline">Submission Deadline (Paid Only)</label>
+      <input id="deadline" name="deadline" type="datetime-local">
+    </div>
+
+    <div>
+      <label for="duration">Estimated Effort Duration</label>
+      <input id="duration" name="duration" maxlength="100" placeholder="e.g., 2 weeks">
+    </div>
+
+    <div>
+      <label for="deliverables">Key Deliverables Checklist</label>
+      <input id="deliverables" name="deliverables" maxlength="1000" placeholder="e.g., Source code + README setup instructions">
+    </div>
+
+    <div class="full">
+      <label for="acceptance_criteria">Verification & Acceptance Criteria</label>
+      <textarea id="acceptance_criteria" name="acceptance_criteria" rows="3" maxlength="3000" placeholder="Conditions that must be met before you accept the solution..."></textarea>
+    </div>
+
+    <div class="full">
+      <label for="attachment">Reference Material / Data Attachment (Max 10 MB)</label>
+      <input id="attachment" type="file" name="attachment" accept=".pdf,.txt,.py,.java,.c,.cpp,.js,.html,.css,.zip,.docx,.md,.png,.jpg,.jpeg">
+      <small style="color: var(--text-subtle); display: block; margin-top: 4px;">Supported: PDF, Code (.py, .js, .java, etc.), Archives (.zip), Documents, Images.</small>
+    </div>
+  </div>
+
+  <div class="notice info" style="margin-top: 20px;">
+    <strong>Platform Transparency:</strong> PDS does not escrow, collect, or process financial payments. All reward arrangements are managed directly between participants.
+  </div>
+
+  <button class="button" type="submit" style="align-self: flex-start;">Publish Challenge &rarr;</button>
+</form>
+{% endblock %}

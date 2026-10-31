@@ -1,4 +1,92 @@
-{% extends "base.html" %}{% block title %}Explore Problems{% endblock %}{% block content %}
-<section class="page-heading"><span class="eyebrow">PROBLEM SOLVING</span><h1>Find your next <span class="gradient-text">challenge</span></h1><p>Search open problems. Paid rewards are offered by deployers; arrangements and payment happen outside this platform.</p></section>
-<form class="filter-panel" method="get"><input name="q" value="{{ q }}" placeholder="Search title, description, category, skills"><select name="type"><option {% if kind=='All' %}selected{% endif %}>All</option><option {% if kind=='Free' %}selected{% endif %}>Free</option><option {% if kind=='Paid' %}selected{% endif %}>Paid</option></select><select name="category"><option value="">All categories</option>{% for c in categories %}<option value="{{ c }}" {% if category==c %}selected{% endif %}>{{ c }}</option>{% endfor %}</select><select name="sort"><option value="newest" {% if sort=='newest' %}selected{% endif %}>Newest</option><option value="oldest" {% if sort=='oldest' %}selected{% endif %}>Oldest</option><option value="views" {% if sort=='views' %}selected{% endif %}>Most viewed</option>{% if kind=='Paid' %}<option value="reward" {% if sort=='reward' %}selected{% endif %}>Highest reward</option><option value="deadline" {% if sort=='deadline' %}selected{% endif %}>Nearest deadline</option>{% endif %}</select><button class="button" type="submit">Search</button></form>
-{% if problems %}<div class="problem-grid">{% for p in problems %}<article class="problem-card"><div class="card-top"><span class="tag">{{ p.category }}</span><span class="status">{{ p.problem_type }}</span></div><h3>{{ p.title }}</h3><p>{{ p.description|truncate(180) }}</p><div class="card-meta"><span>By {{ p.deployer_name }}</span><span>{{ p.solution_count }} submissions</span></div>{% if p.problem_type=='Paid' %}<div class="reward-line">Reward offered: ₹{{ '%.2f'|format(p.reward) }}</div><div class="muted small">Deadline: {{ p.deadline or 'Not specified' }}</div>{% endif %}<a class="text-link" href="{{ url_for('detail',problem_id=p.id) }}">View details →</a></article>{% endfor %}</div>{% else %}<div class="empty-state"><h3>No matching problems</h3><p>Try a different search or category.</p></div>{% endif %}{% endblock %}
+{% extends "base.html" %}
+
+{% block title %}Explore Challenges — PDS{% endblock %}
+
+{% block content %}
+<section style="margin-bottom: 24px;">
+  <span class="eyebrow">Problem Marketplace</span>
+  <h1>Discover open <span class="gradient-text">challenges</span></h1>
+  <p>Search active technical challenges. Filter by category, reward, or deadline. Compensation agreements occur independently between participants.</p>
+</section>
+
+<form class="filter-panel" method="get" action="{{ url_for('dashboard') }}">
+  <input name="q" value="{{ q }}" placeholder="Search titles, descriptions, skills...">
+  
+  <select name="type">
+    <option value="All" {% if kind == 'All' %}selected{% endif %}>All Types</option>
+    <option value="Free" {% if kind == 'Free' %}selected{% endif %}>Free Projects</option>
+    <option value="Paid" {% if kind == 'Paid' %}selected{% endif %}>Paid Offers</option>
+  </select>
+
+  <select name="category">
+    <option value="">All Categories</option>
+    {% for c in categories %}
+      <option value="{{ c }}" {% if category == c %}selected{% endif %}>{{ c }}</option>
+    {% endfor %}
+  </select>
+
+  <select name="sort">
+    <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Newest First</option>
+    <option value="oldest" {% if sort == 'oldest' %}selected{% endif %}>Oldest First</option>
+    <option value="views" {% if sort == 'views' %}selected{% endif %}>Most Viewed</option>
+    {% if kind == 'Paid' %}
+      <option value="reward" {% if sort == 'reward' %}selected{% endif %}>Highest Reward</option>
+      <option value="deadline" {% if sort == 'deadline' %}selected{% endif %}>Nearest Deadline</option>
+    {% endif %}
+  </select>
+
+  <button class="button" type="submit">Filter Results</button>
+  {% if q or category or kind != 'All' or sort != 'newest' %}
+    <a class="button secondary" href="{{ url_for('dashboard') }}">Reset</a>
+  {% endif %}
+</form>
+
+{% if problems %}
+  <div style="margin-bottom: 16px; font-size: 0.88rem; color: var(--text-muted);">
+    Showing {{ problems|length }} of {{ total_records }} challenges found
+  </div>
+  <div class="problem-grid">
+    {% for p in problems %}
+      <article class="problem-card">
+        <div class="card-top">
+          <span class="tag">{{ p.category }}</span>
+          <span class="status {% if p.problem_type == 'Paid' %}paid{% endif %}">{{ p.problem_type }}</span>
+        </div>
+        <h3>{{ p.title }}</h3>
+        <p>{{ p.description|truncate(175) }}</p>
+
+        {% if p.problem_type == 'Paid' %}
+          <div class="reward-line">${{ '%.2f'|format(p.reward) }}</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted);">
+            Deadline: {{ p.deadline or 'Flexible' }}
+          </div>
+        {% endif %}
+
+        <div class="card-meta">
+          <span>Published by <b>{{ p.deployer_name }}</b></span>
+          <span>{{ p.solution_count }} proposals &bull; {{ p.views }} views</span>
+        </div>
+        <a class="text-link" href="{{ url_for('detail', problem_id=p.id) }}">Inspect Problem &rarr;</a>
+      </article>
+    {% endfor %}
+  </div>
+
+  {% if total_pages > 1 %}
+    <nav class="pagination" aria-label="Challenges Pagination">
+      {% if page > 1 %}
+        <a class="page-btn" href="{{ url_for('dashboard', page=page-1, q=q, type=kind, category=category, sort=sort) }}">&larr; Previous</a>
+      {% endif %}
+      <span style="font-size: 0.88rem; color: var(--text-muted); padding: 0 10px;">Page {{ page }} of {{ total_pages }}</span>
+      {% if page < total_pages %}
+        <a class="page-btn" href="{{ url_for('dashboard', page=page+1, q=q, type=kind, category=category, sort=sort) }}">Next &rarr;</a>
+      {% endif %}
+    </nav>
+  {% endif %}
+{% else %}
+  <div class="empty-state">
+    <h3>No matching challenges found</h3>
+    <p>Try broadening your query keywords or adjusting category filters.</p>
+    <a class="button" href="{{ url_for('dashboard') }}">Clear Filters</a>
+  </div>
+{% endif %}
+{% endblock %}
